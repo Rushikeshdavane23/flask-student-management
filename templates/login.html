@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3 class="mb-0"><i class="bi bi-box-arrow-in-right me-2"></i>Login</h3>
+                <p class="mb-0 mt-2">Access your Student Management System account</p>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-4">
+                        <label for="username" class="form-label fw-semibold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                        <a href="#" class="float-end text-decoration-none">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                    </button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-3">Or login with</p>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <button class="btn btn-outline-dark me-sm-2" type="button">
+                            <i class="bi bi-google me-2"></i>Google
+                        </button>
+                        <button class="btn btn-outline-primary" type="button">
+                            <i class="bi bi-microsoft me-2"></i>Microsoft
+                        </button>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-0">Don't have an account? 
+                        <a href="{{ url_for('register') }}" class="text-decoration-none fw-semibold">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-light rounded text-center">
+            <h6 class="mb-2">Demo Accounts</h6>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <small class="text-muted">Teacher: admin / admin123</small>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <small class="text-muted">Student: john_doe / john123</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

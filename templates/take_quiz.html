@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Take Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student_courses') }}">My Courses</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student_course_detail', course_id=quiz.course_id) }}">{{ quiz.course_name }}</a></li>
+        <li class="breadcrumb-item active">Take Quiz</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ quiz.title }}</h3>
+                <p class="card-subtitle mb-0">{{ quiz.description }}</p>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">Quiz Instructions</h6>
+                    <ul class="mb-0">
+                        <li>Time limit: {{ quiz.time_limit }} minutes</li>
+                        <li>This quiz contains {{ questions|length }} questions</li>
+                        <li>Total marks: {{ quiz.total_marks }}</li>
+                        {% if quiz.due_date %}
+                        <li>Due: {{ quiz.due_date.strftime('%Y-%m-%d at %H:%M') }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <form method="POST" action="{{ url_for('take_quiz', quiz_id=quiz.id) }}">
+                    <input type="hidden" name="attempt_id" value="{{ attempt_id }}">
+                    
+                    {% for question in questions %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Question {{ loop.index }}</h5>
+                            <span class="badge bg-primary">{{ question.marks }} mark{{ 's' if question.marks > 1 }}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ question.question_text }}</p>
+                            
+                            {% if question.question_type == 'multiple_choice' %}
+                                {% set options = question.options|tojson|parse_json if question.options else {} %}
+                                {% for letter, text in options.items() %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_{{ letter }}" value="{{ letter }}" required>
+                                    <label class="form-check-label" for="question_{{ question.id }}_{{ letter }}">
+                                        <strong>{{ letter }}.</strong> {{ text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                                
+                            {% elif question.question_type == 'true_false' %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_true" value="True" required>
+                                    <label class="form-check-label" for="question_{{ question.id }}_true">True</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_false" value="False">
+                                    <label class="form-check-label" for="question_{{ question.id }}_false">False</label>
+                                </div>
+                                
+                            {% else %}
+                                <div class="form-group">
+                                    <label for="question_{{ question.id }}_answer" class="form-label">Your answer:</label>
+                                    <textarea class="form-control" id="question_{{ question.id }}_answer" name="question_{{ question.id }}" rows="3" required></textarea>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Quiz</button>
+                        <a href="{{ url_for('student_course_detail', course_id=quiz.course_id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

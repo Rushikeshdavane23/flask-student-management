@@ -1,0 +1,214 @@
+/* Additional CSS for new features */
+.min-vh-70 {
+    min-height: 70vh;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.sorted-asc::after {
+    content: " ▲";
+    font-size: 0.8em;
+}
+
+.sorted-desc::after {
+    content: " ▼";
+    font-size: 0.8em;
+}
+
+.table-search {
+    max-width: 300px;
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .navbar, .btn, .card-header .btn {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .card-body {
+        padding: 0 !important;
+    }
+}
+
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    animation: spin 0.75s linear infinite;
+}
+
+/* Custom styles for tables */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Custom button styles */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Custom card styles */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Role badges */
+.role-badge {
+    font-size: 0.7rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Navigation icons */
+.navbar-nav .nav-link {
+    display: flex;
+    align-items: center;
+}
+
+/* Course progress */
+.progress {
+    height: 20px;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* Quiz and assignment cards */
+.assessment-card {
+    border-left: 4px solid #0d6efd;
+}
+
+.assessment-card.late {
+    border-left-color: #dc3545;
+}
+
+.assessment-card.completed {
+    border-left-color: #198754;
+}
+
+/* Content cards */
+.content-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.content-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 500;
+}
+
+/* Alert icons */
+.alert i {
+    font-size: 1.2em;
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    border-radius: 0.25rem;
+    margin: 0.125rem 0.5rem;
+    width: auto;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Question cards in quizzes */
+.question-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.question-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Multiple choice options */
+.multiple-choice-options .input-group {
+    margin-bottom: 0.5rem;
+}
+
+.multiple-choice-options .input-group-text {
+    min-width: 2.5rem;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-nav .nav-link {
+        padding: 0.5rem 1rem;
+    }
+    
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+}

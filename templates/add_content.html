@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Add Content - {{ course.course_code }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('teacher_courses') }}">My Courses</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('teacher_course_detail', course_id=course.id) }}">{{ course.course_code }}</a></li>
+        <li class="breadcrumb-item active">Add Content</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Add Content to {{ course.course_code }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_course_content', course_id=course.id) }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content_type" class="form-label">Content Type</label>
+                        <select class="form-select" id="content_type" name="content_type" required>
+                            <option value="">Select content type</option>
+                            <option value="note">Note</option>
+                            <option value="assignment">Assignment</option>
+                            <option value="resource">Resource</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">File (Optional)</label>
+                        <input class="form-control" type="file" id="file" name="file">
+                        <div class="form-text">Upload a PDF, document, or other resource file.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Add Content</button>
+                        <a href="{{ url_for('teacher_course_detail', course_id=course.id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}My Courses{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">My Courses</h2>
+
+<div class="row">
+    {% if courses %}
+        {% for course in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ course.course_code }}</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{ course.course_name }}</h6>
+                    <p class="card-text">{{ course.description|truncate(100) }}</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Credits
+                            <span class="badge bg-primary rounded-pill">{{ course.credits }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Status
+                            <span class="badge bg-{{ 'success' if course.status == 'enrolled' else 'secondary' if course.status == 'completed' else 'warning' }} rounded-pill">
+                                {{ course.status }}
+                            </span>
+                        </li>
+                        {% if course.grade %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Grade
+                            <span class="badge bg-info rounded-pill">{{ course.grade }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('student_course_detail', course_id=course.id) }}" class="btn btn-primary btn-sm">View Course</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4 class="alert-heading">No Enrollments Yet</h4>
+                <p>You are not enrolled in any courses yet. Please contact your instructor to get enrolled.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

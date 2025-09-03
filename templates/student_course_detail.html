@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_code }} - {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student_courses') }}">My Courses</a></li>
+        <li class="breadcrumb-item active">{{ course.course_code }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ course.course_code }}: {{ course.course_name }}</h2>
+    <span class="badge bg-{{ 'success' if course.status == 'enrolled' else 'secondary' if course.status == 'completed' else 'warning' }}">
+        {{ course.status }}
+    </span>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Description:</strong> {{ course.description }}</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Credits:</strong> {{ course.credits }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Department:</strong> {{ course.department }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Grade:</strong> {{ course.grade if course.grade else 'Not graded yet' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Content</h5>
+            </div>
+            <div class="card-body">
+                {% if content %}
+                <div class="list-group">
+                    {% for item in content %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ item.title }}</h6>
+                            <span class="badge bg-{{ 'info' if item.content_type == 'note' else 'warning' if item.content_type == 'assignment' else 'secondary' }}">
+                                {{ item.content_type }}
+                            </span>
+                        </div>
+                        <p class="mb-1">{{ item.description }}</p>
+                        <small class="text-muted">Added on {{ item.created_at.strftime('%Y-%m-%d') }}</small>
+                        {% if item.file_path %}
+                        <div class="mt-2">
+                            <a href="{{ url_for('static', filename=item.file_path) }}" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No content available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quizzes</h5>
+            </div>
+            <div class="card-body">
+                {% if quizzes %}
+                <div class="list-group">
+                    {% for quiz in quizzes %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ quiz.title }}</h6>
+                            <span class="badge bg-primary">{{ quiz.total_marks }} marks</span>
+                        </div>
+                        <p class="mb-1">{{ quiz.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">Due: {{ quiz.due_date.strftime('%Y-%m-%d %H:%M') if quiz.due_date else 'No due date' }}</small>
+                                <small class="text-muted d-block">Time limit: {{ quiz.time_limit }} minutes</small>
+                            </div>
+                            <div>
+                                {% set attempt = quiz_attempts[quiz.id] %}
+                                {% if attempt and attempt.status == 'submitted' %}
+                                    <span class="badge bg-success">Completed</span>
+                                    <small class="d-block text-center">Score: {{ attempt.score }}/{{ quiz.total_marks }}</small>
+                                {% elif attempt and attempt.status == 'in_progress' %}
+                                    <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn btn-warning btn-sm">Continue Quiz</a>
+                                {% else %}
+                                    <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">Take Quiz</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No quizzes available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Assignments</h5>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="list-group">
+                    {% for assignment in assignments %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ assignment.title }}</h6>
+                            <span class="badge bg-primary">{{ assignment.total_marks }} marks</span>
+                        </div>
+                        <p class="mb-1">{{ assignment.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Due: {{ assignment.due_date.strftime('%Y-%m-%d %H:%M') if assignment.due_date else 'No due date' }}</small>
+                            <div>
+                                {% set submission = assignment_submissions[assignment.id] %}
+                                {% if submission and submission.status == 'submitted' %}
+                                    <span class="badge bg-{{ 'success' if submission.status == 'graded' else 'info' }}">
+                                        {{ 'Graded' if submission.status == 'graded' else 'Submitted' }}
+                                    </span>
+                                    {% if submission.status == 'graded' %}
+                                        <small class="d-block text-center">Score: {{ submission.marks }}/{{ assignment.total_marks }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Submitted</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No assignments available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Overall Grade</h6>
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-{{ 'success' if course.grade in ['A', 'A-', 'B+', 'B'] else 'warning' if course.grade in ['B-', 'C+', 'C'] else 'danger' if course.grade else 'secondary' }}" 
+                             role="progressbar" style="width: {{ 85 if course.grade == 'A' else 80 if course.grade == 'A-' else 75 if course.grade == 'B+' else 70 if course.grade == 'B' else 65 if course.grade == 'B-' else 60 if course.grade == 'C+' else 55 if course.grade == 'C' else 50 if course.grade == 'C-' else 0 }}%;" 
+                             aria-valuenow="{{ 85 if course.grade == 'A' else 80 if course.grade == 'A-' else 75 if course.grade == 'B+' else 70 if course.grade == 'B' else 65 if course.grade == 'B-' else 60 if course.grade == 'C+' else 55 if course.grade == 'C' else 50 if course.grade == 'C-' else 0 }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ course.grade if course.grade else 'No grade' }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Content Viewed</h6>
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Quizzes Completed</h6>
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">2/5</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Assignments Submitted</h6>
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">1/4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Upcoming Deadlines</h5>
+            </div>
+            <div class="card-body">
+                {% set has_deadlines = false %}
+                {% for quiz in quizzes if quiz.due_date and quiz.due_date > now %}
+                    {% set has_deadlines = true %}
+                    <div class="mb-2">
+                        <h6 class="mb-0">{{ quiz.title }}</h6>
+                        <small class="text-muted">Quiz - Due {{ quiz.due_date.strftime('%m/%d at %H:%M') }}</small>
+                    </div>
+                    {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+                
+                {% for assignment in assignments if assignment.due_date and assignment.due_date > now %}
+                    {% set has_deadlines = true %}
+                    {% if not loop.first or quizzes %}<hr>{% endif %}
+                    <div class="mb-2">
+                        <h6 class="mb-0">{{ assignment.title }}</h6>
+                        <small class="text-muted">Assignment - Due {{ assignment.due_date.strftime('%m/%d at %H:%M') }}</small>
+                    </div>
+                {% endfor %}
+                
+                {% if not has_deadlines %}
+                    <p class="text-muted">No upcoming deadlines.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

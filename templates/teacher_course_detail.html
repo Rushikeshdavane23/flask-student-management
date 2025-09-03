@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_code }} - {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('teacher_courses') }}">My Courses</a></li>
+        <li class="breadcrumb-item active">{{ course.course_code }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ course.course_code }}: {{ course.course_name }}</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('add_course_content', course_id=course.id) }}" class="btn btn-outline-primary">Add Content</a>
+        <a href="{{ url_for('create_quiz', course_id=course.id) }}" class="btn btn-outline-success">Create Quiz</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Description:</strong> {{ course.description }}</p>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Credits:</strong> {{ course.credits }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Department:</strong> {{ course.department }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Enrolled Students:</strong> {{ students|length }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Content</h5>
+            </div>
+            <div class="card-body">
+                {% if content %}
+                <div class="list-group">
+                    {% for item in content %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ item.title }}</h6>
+                            <span class="badge bg-{{ 'info' if item.content_type == 'note' else 'warning' if item.content_type == 'assignment' else 'secondary' }}">
+                                {{ item.content_type }}
+                            </span>
+                        </div>
+                        <p class="mb-1">{{ item.description }}</p>
+                        <small class="text-muted">Added on {{ item.created_at.strftime('%Y-%m-%d') }}</small>
+                        {% if item.file_path %}
+                        <div class="mt-2">
+                            <a href="{{ url_for('static', filename=item.file_path) }}" class="btn btn-sm btn-outline-primary" target="_blank">Download File</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No content added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quizzes</h5>
+            </div>
+            <div class="card-body">
+                {% if quizzes %}
+                <div class="list-group">
+                    {% for quiz in quizzes %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ quiz.title }}</h6>
+                            <span class="badge bg-primary">{{ quiz.total_marks }} marks</span>
+                        </div>
+                        <p class="mb-1">{{ quiz.description }}</p>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">Due: {{ quiz.due_date.strftime('%Y-%m-%d %H:%M') if quiz.due_date else 'No due date' }}</small>
+                            <small class="text-muted">Time limit: {{ quiz.time_limit }} minutes</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No quizzes created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Assignments</h5>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="list-group">
+                    {% for assignment in assignments %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ assignment.title }}</h6>
+                            <span class="badge bg-primary">{{ assignment.total_marks }} marks</span>
+                        </div>
+                        <p class="mb-1">{{ assignment.description }}</p>
+                        <small class="text-muted">Due: {{ assignment.due_date.strftime('%Y-%m-%d %H:%M') if assignment.due_date else 'No due date' }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No assignments created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Enrolled Students</h5>
+            </div>
+            <div class="card-body">
+                {% if students %}
+                <div class="list-group">
+                    {% for student in students %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ student.first_name }} {{ student.last_name }}</h6>
+                            <span class="badge bg-{{ 'success' if student.status == 'enrolled' else 'secondary' if student.status == 'completed' else 'warning' }}">
+                                {{ student.status }}
+                            </span>
+                        </div>
+                        <p class="mb-1 small">{{ student.email }}</p>
+                        <small class="text-muted">
+                            {% if student.grade %}
+                            Grade: {{ student.grade }}
+                            {% else %}
+                            No grade yet
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No students enrolled yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('add_course_content', course_id=course.id) }}" class="btn btn-primary">Add Content</a>
+                    <a href="{{ url_for('create_quiz', course_id=course.id) }}" class="btn btn-success">Create Quiz</a>
+                    <a href="#" class="btn btn-info">View Analytics</a>
+                    <a href="#" class="btn btn-warning">Export Grades</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
